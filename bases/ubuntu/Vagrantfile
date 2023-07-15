@@ -1,6 +1,31 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 Vagrant.configure("2") do |config|
-  config.vm.box = "almalinux/9"
+  config.vm.provider "hyperv" do |v|
+    v.memory = 4096
+    v.cpus = 2
+    v.vm.generation = 2
+
+    config.ssh.username = "vagrant"
+    config.ssh.password = "vagrant"
+  end
+
+  config.vm.box = "ubuntu2204"
   config.vm.hostname = "cthacker-vm"
+  config.vm.network "public_network", bridge: "Default Switch"
+  config.vm.boot_timeout = 1000
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.provision "shell", path: "scripts/enable-enhanced-session.sh", privileged: true
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo apt-get update
+    sudo apt-get upgrade -y
+    echo 'Rebooting now...'
+    nohup bash -c 'sleep 5 && sudo reboot' &
+    exit
+  SHELL
+
+  config.vm.provision "shell", run: "always", inline: <<-SHELL
+    echo 'System rebooted'
+    # Continue with the rest of your script here
+  SHELL
 end

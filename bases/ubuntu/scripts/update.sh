@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
-set -e
-set -v
+set -xe
 
 # Update the system
 sudo apt-get update
-sudo apt-get upgrade -y
-
-# Install basic utilities
-sudo apt-get install -y curl wget git
+sudo apt-get dist-upgrade -y
+sleep 60 && sudo shutdown -r now &
+exit 0

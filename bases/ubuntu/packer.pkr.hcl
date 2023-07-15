@@ -30,7 +30,7 @@ source "hyperv-iso" "ubuntu2204" {
       username        = var.username
       password        = var.hashed_password
       hostname        = var.username
-      locale          = "en_GB"
+      locale          = "en_US"
     })
     "/meta-data" = ""
   }
@@ -46,26 +46,28 @@ source "hyperv-iso" "ubuntu2204" {
 
   vm_name           = var.vm_name
   boot_wait         = "10s"
+  # https://github.com/hashicorp/packer-plugin-hyperv/issues/65#issuecomment-1603306355
+  switch_name       = "Wi-Fi"
   ssh_username      = var.username
+  generation        = 2
   ssh_password      = var.password
   ssh_port          = 22
-  ssh_wait_timeout  = "10000s"
+  ssh_wait_timeout  = "1000s"
   shutdown_command  = "echo 'vagrant'|sudo -S shutdown -P now"
 }
 
 build {
   sources = ["source.hyperv-iso.ubuntu2204"]
 
+
   provisioner "shell" {
-    script = "scripts/update.sh"
+    script            = "scripts/update.sh"
+    expect_disconnect = true
   }
 
   provisioner "shell" {
-    script = "scripts/cleanup.sh"
-  }
-
-  provisioner "shell" {
-    script = "scripts/minimise.sh"
+    script       = "scripts/cleanup.sh"
+    pause_before = "120s"
   }
 
   post-processor "vagrant" {

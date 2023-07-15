@@ -22,7 +22,7 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
-apt update && apt upgrade -y
+apt-get update && apt-get upgrade -y
 
 if [ -f /var/run/reboot-required ]; then
     echo "A reboot is required in order to proceed with the install." >&2
@@ -46,7 +46,7 @@ systemctl stop xrdp-sesman
 
 # Configure the installed XRDP ini files.
 # use vsock transport.
-sed -i_orig -e 's/port=3389/port=vsock:\/\/-1:3389/g' /etc/xrdp/xrdp.ini
+sed -i_orig -e 's/port=3389/port=3389/g' /etc/xrdp/xrdp.ini
 # use rdp security.
 sed -i_orig -e 's/security_layer=negotiate/security_layer=rdp/g' /etc/xrdp/xrdp.ini
 # remove encryption validation.
@@ -96,7 +96,8 @@ EOF
 
 # reconfigure the service
 systemctl daemon-reload
-systemctl start xrdp
+systemctl start xrdp && \
+systemctl enable xrdp
 
 #
 # End XRDP

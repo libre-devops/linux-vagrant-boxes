@@ -1,3 +1,5 @@
+Write-Host "You will likely need administrator or very high permissions to run this script"
+
 try {
     $opensslVersion = & openssl version
     Write-Host "OpenSSL is installed: $opensslVersion"
@@ -27,6 +29,58 @@ if ($null -eq $firewallRule) {
 } else {
     # If the firewall rule already exists, skip it
     Write-Host "Firewall rule for ports $startPort-$endPort already exists"
+}
+
+# Define the start and end of the port range, vagrant by default uses 8000-9000
+$startPort = 3389
+$endPort = 3389
+
+# Define the rule name
+$ruleName = "Open Ports $startPort-$endPort"
+
+# Check if a firewall rule for this port range already exists
+$firewallRule = Get-NetFirewallRule -DisplayName $ruleName -ErrorAction SilentlyContinue
+
+if ($null -eq $firewallRule) {
+    # If the firewall rule doesn't exist, create it
+    New-NetFirewallRule -DisplayName $ruleName -Direction Inbound -LocalPort $startPort-$endPort -Protocol TCP -Action Allow
+    Write-Host "Created firewall rule for ports $startPort-$endPort"
+} else {
+    # If the firewall rule already exists, skip it
+    Write-Host "Firewall rule for ports $startPort-$endPort already exists"
+}
+
+
+# Define the start and end of the port range, vagrant by default uses 8000-9000
+$startPort = 22
+$endPort = 22
+
+# Define the rule name
+$ruleName = "Open Ports $startPort-$endPort"
+
+# Check if a firewall rule for this port range already exists
+$firewallRule = Get-NetFirewallRule -DisplayName $ruleName -ErrorAction SilentlyContinue
+
+if ($null -eq $firewallRule) {
+    # If the firewall rule doesn't exist, create it
+    New-NetFirewallRule -DisplayName $ruleName -Direction Inbound -LocalPort $startPort-$endPort -Protocol TCP -Action Allow
+    Write-Host "Created firewall rule for ports $startPort-$endPort"
+} else {
+    # If the firewall rule already exists, skip it
+    Write-Host "Firewall rule for ports $startPort-$endPort already exists"
+}
+
+
+$VirtualSwitch = "Wi-Fi"
+$IF_ALIAS = (Get-NetAdapter -Name "vEthernet ($VirtualSwitch)").ifAlias
+
+if ($null -eq $firewallRule) {
+    # If the firewall rule doesn't exist, create it
+    New-NetFirewallRule -Displayname "Allow incoming from $VirtualSwitch" -Direction Inbound -InterfaceAlias $IF_ALIAS -Action Allow
+    Set-NetConnectionProfile -InterfaceAlias $IF_ALIAS -NetworkCategory Private
+} else {
+    # If the firewall rule already exists, skip it
+    Write-Host "Firewall rule for virtual switch $VirtualSwitch exists"
 }
 
 # Generate 6 random bytes
@@ -73,4 +127,7 @@ try {
 # If Packer failed, clean up the VM
 if ($LASTEXITCODE -ne 0) {
     Cleanup
+}
+else {
+    vagrant box add ubuntu2204.box --name ubuntu2204 --force
 }

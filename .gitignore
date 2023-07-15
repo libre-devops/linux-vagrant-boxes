@@ -58,3 +58,4 @@ build-iPhoneSimulator/
 *.iso
 packer_cache/
 .vagrant
+*.box
