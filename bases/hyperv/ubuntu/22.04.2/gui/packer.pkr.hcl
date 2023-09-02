@@ -1,7 +1,7 @@
 variable "vm_name" {
   type        = string
   description = "The name of the VM"
-  default     = "packer-ubuntu22.04base"
+  default     = "packer-ubuntu22.04.2base"
 }
 
 variable "username" {
@@ -31,19 +31,19 @@ variable "os_version" {
 variable "os_checksum" {
   type        = string
   description = "The checksum of the OS, can be fetched programmatically"
-  default     = "b98dac940a82b110e6265ca78d1320f1f7103861e922aa1a54e4202686e9bbd3 "
+  default     = "5e38b55d57d94ff029719342357325ed3bda38fa80054f9330dc789cd2d43931"
 }
 
 variable "os_type" {
   type        = string
   description = "The type of OS, e.g, server-amd64 etc"
-  default     = "desktop-amd64"
+  default     = "live-server-amd64"
 }
 
 variable "os_url" {
   type        = string
   description = "The URL in which the ISO for the OS can be found"
-  default     = "https://releases.ubuntu.com/22.04.2/ubuntu-22.04.2-desktop-amd64.iso"
+  default     = "https://releases.ubuntu.com/22.04.2/ubuntu-22.04.2-live-server-amd64.iso"
 }
 
 variable "os_locale" {
@@ -51,6 +51,13 @@ variable "os_locale" {
   description = "The locale of the OS"
   default     = "en_US"
 }
+
+variable "vagrant_box_name" {
+  type = string
+  description = "The name of the vagrant output box"
+  default = "ubuntu-22.04.2.box"
+}
+
 
 variable "network_adapter" {
   type        = string
@@ -106,7 +113,8 @@ build {
       "mkdir -p /home/vagrant/.ssh",
       "curl -L -o /home/vagrant/.ssh/authorized_keys https://raw.githubusercontent.com/hashicorp/vagrant/main/keys/vagrant.pub",
       "chown -R vagrant:vagrant /home/vagrant/.ssh",
-      "chmod -R go-rwsx /home/vagrant/.ssh"
+      "chmod -R go-rwsx /home/vagrant/.ssh",
+      "sudo apt-get install ubuntu-desktop -y"
     ]
   }
 
@@ -116,6 +124,6 @@ build {
   }
 
   post-processor "vagrant" {
-    output = "ubuntu${var.os_version}.box"
+    output = var.vagrant_box_name
   }
 }

@@ -1,7 +1,7 @@
 variable "vm_name" {
   type        = string
   description = "The name of the VM"
-  default     = "packer-ubuntu22.04base"
+  default     = "packer-ubuntu22.04.2base"
 }
 
 variable "username" {
@@ -50,6 +50,12 @@ variable "os_locale" {
   type        = string
   description = "The locale of the OS"
   default     = "en_US"
+}
+
+variable "vagrant_box_name" {
+  type = string
+  description = "The name of the vagrant output box"
+  default = "ubuntu-22.04.2.box"
 }
 
 variable "network_adapter" {
@@ -116,6 +122,6 @@ build {
   }
 
   post-processor "vagrant" {
-    output = "ubuntu${var.os_version}.box"
+    output = var.vagrant_box_name
   }
 }
